@@ -1,0 +1,9 @@
+---
+- name: Kops Validation
+  hosts: kops
+  become: true
+  tasks:
+    - name: Ensure kops is installed
+      ansible.builtin.command: "kops version"
+    - name: Validate the Kops Cluster
+      ansible.builtin.command: "kops validate cluster --name=kubevpro.devopshemantkumar.info --state=s3://kopsstate1234567890"

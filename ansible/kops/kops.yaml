@@ -1,0 +1,11 @@
+---
+- name: Kops Cluster setup
+  hosts: kops
+  become: true
+  tasks:
+    - name: Ensure kops is installed
+      ansible.builtin.command: "kops version"
+    - name: Installing Kops Cluster
+      ansible.builtin.command: "kops create cluster --name=kubevpro.devopshemantkumar.info --state=s3://kopsstate1234567890 --zones=us-east-1a,us-east-1b --node-count=2 --node-size=t3.medium --control-plane-size=t3.medium --dns-zone=kubevpro.devopshemantkumar.info --node-volume-size=20 --control-plane-volume-size=20 --ssh-public-key ~/.ssh/id_ed25519.pub"
+    - name: Update the Cluster
+      ansible.builtin.command: "kops update cluster --name=kubevpro.devopshemantkumar.info --state=s3://kopsstate1234567890 --yes --admin"

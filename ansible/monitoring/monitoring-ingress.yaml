@@ -1,0 +1,23 @@
+---
+- name: Setup Monitoring Ingress
+  hosts: kops
+  become: true
+  tasks:
+    - name: Copy Grafana Ingress template
+      ansible.builtin.template:
+        src: ../templates/grafanaingress.yaml
+        dest: /tmp/grafanaingress.yaml
+        
+    - name: Copy Prometheus Ingress template
+      ansible.builtin.template:
+        src: ../templates/prometheusingress.yaml
+        dest: /tmp/prometheusingress.yaml
+        
+    - name: Apply Grafana Ingress
+      ansible.builtin.command: "kubectl apply -f /tmp/grafanaingress.yaml"
+      
+    - name: Apply Prometheus Ingress
+      ansible.builtin.command: "kubectl apply -f /tmp/prometheusingress.yaml"
+      
+    - name: Check ingress status
+      ansible.builtin.command: "kubectl get ingress -n monitoring"

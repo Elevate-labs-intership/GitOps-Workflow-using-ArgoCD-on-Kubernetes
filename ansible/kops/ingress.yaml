@@ -1,0 +1,11 @@
+---
+- name: "Install Nginx Ingress Controller"
+  hosts: kops
+  become: true
+  tasks:
+    - name: Delete existing ingress-nginx admission jobs
+      ansible.builtin.command: "kubectl delete jobs -n ingress-nginx ingress-nginx-admission-create ingress-nginx-admission-patch"
+      ignore_errors: true
+
+    - name: Install Nginx Ingress Controller
+      ansible.builtin.command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.2/deploy/static/provider/aws/deploy.yaml"

@@ -1,0 +1,20 @@
+---
+- name: ArgoCD setup
+  hosts: kops
+  become: true
+  tasks:
+    - name: Create a namespace for Argo CD
+      ansible.builtin.command: "kubectl create namespace argocd"
+      ignore_errors: yes
+    - name: Apply the Argo CD manifest
+      ansible.builtin.command: "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+    - name: Check services in Argo CD namespace
+      ansible.builtin.command: "kubectl get svc -n argocd"
+      
+    - name: Copy ArgoCD Ingress template
+      ansible.builtin.template:
+        src: ../templates/argoingress.yaml
+        dest: /tmp/argoingress.yaml
+        
+    - name: Apply ArgoCD Ingress
+      ansible.builtin.command: "kubectl apply -f /tmp/argoingress.yaml"

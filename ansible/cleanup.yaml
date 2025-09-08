@@ -1,0 +1,13 @@
+---
+- name: Cluster Cleanup
+  hosts: kops
+  become: true
+  tasks:
+    - name: Delete the cluster
+      ansible.builtin.command: "kops delete cluster --name=kubevpro.devopshemantkumar.info --state=s3://kopsstate1234567890 --yes"
+      register: delete_cluster
+      ignore_errors: yes
+      
+    - name: Display cluster deletion result
+      ansible.builtin.debug:
+        msg: "{{ delete_cluster.stdout }}"

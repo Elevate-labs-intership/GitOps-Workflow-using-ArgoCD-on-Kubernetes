@@ -1,0 +1,29 @@
+---
+- name: "Check Nginx Ingress Controller Status"
+  hosts: kops
+  become: true
+  tasks:
+    - name: Check ingress-nginx namespace pods
+      ansible.builtin.command: "kubectl get pods -n ingress-nginx"
+      register: ingress_pods
+
+    - name: Display ingress pods status
+      debug:
+        msg: "{{ ingress_pods.stdout_lines }}"
+
+    - name: Check ingress-nginx service
+      ansible.builtin.command: "kubectl get svc -n ingress-nginx"
+      register: ingress_service
+
+    - name: Display ingress service details
+      debug:
+        msg: "{{ ingress_service.stdout_lines }}"
+
+    - name: Get load balancer external IP/hostname
+      ansible.builtin.command: "kubectl get svc ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'"
+      register: lb_hostname
+      ignore_errors: true
+
+    - name: Display load balancer hostname
+      debug:
+        msg: "Load Balancer Hostname: {{ lb_hostname.stdout }}"

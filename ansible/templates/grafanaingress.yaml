@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: monitoring
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      grpc_read_timeout 300;
+      grpc_send_timeout 300;
+      client_max_body_size 1m;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: monitoring.devopshemantkumar.info
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kind-prometheus-grafana
+            port:
+              number: 80

@@ -1,0 +1,37 @@
+---
+- name: Prometus setup
+  hosts: kops
+  become: true
+  tasks:
+   - name: Get Helm Installation script
+     ansible.builtin.command: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+   - name: Make Helm script executable
+     ansible.builtin.file:
+       path: ./get_helm.sh
+       mode: '0700'
+       
+   - name: Install Helm
+     ansible.builtin.shell: "./get_helm.sh"
+   - name: Add Prometheus Helm repo
+     ansible.builtin.shell: "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
+     
+   - name: Update Helm repos
+     ansible.builtin.shell: "helm repo update"
+     
+   - name: Create monitoring namespace
+     ansible.builtin.command: "kubectl create namespace monitoring"
+     ignore_errors: yes
+     
+   - name: Install Kube Prometheus Stack
+     ansible.builtin.shell: |
+       helm install kind-prometheus prometheus-community/kube-prometheus-stack \
+       --namespace monitoring \
+       --set prometheus.service.nodePort=30000 \
+       --set prometheus.service.type=NodePort \
+       --set grafana.service.nodePort=31000 \
+       --set grafana.service.type=NodePort \
+       --set alertmanager.service.nodePort=32000 \
+       --set alertmanager.service.type=NodePort
+       
+   - name: Check services
+     ansible.builtin.command: "kubectl get svc -n monitoring"
