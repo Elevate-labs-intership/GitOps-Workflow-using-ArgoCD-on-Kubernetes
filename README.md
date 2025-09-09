@@ -93,12 +93,10 @@ all:
 
 *Optional: Run `ansible-playbook server-config.yaml` if manual configuration is needed.*
 
-### Step 3: Setup AWS Credentials on kops Server
+### Step 3: AWS Credentials Setup (Automated)
+**Note:** AWS credentials are automatically configured during Terraform provisioning via the `web.sh` script.
 
-```bash
-# Copy AWS credentials to kops server
-ansible-playbook kops/setup-credentials.yaml
-```
+*Optional: Run `ansible-playbook kops/setup-credentials.yaml` if credentials need to be reconfigured.*
 
 ### Step 4: Kubernetes Cluster Setup with kops
 
