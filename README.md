@@ -289,7 +289,7 @@ This project demonstrates:
 *Complete GitOps workflow architecture showing the integration between Terraform, Ansible, Kubernetes, and ArgoCD*
 
 ### Grafana Dashboard
-![Grafana Dashboard](images/grafana.png)
+![Grafana Dashboard](images/grafana-dashboard.png)
 *Grafana monitoring dashboard showing Kubernetes cluster metrics and performance indicators*
 
 ### Prometheus Metrics
