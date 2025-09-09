@@ -81,18 +81,17 @@ all:
     ansible_ssh_private_key_file: StackOps-1.pem
 ```
 
-#### 2.3 Configure Server
-```bash
-# Install required tools (Ansible, kops, kubectl, AWS CLI)
-ansible-playbook server-config.yaml
-```
+#### 2.3 Server Configuration (Automated)
+**Note:** Server configuration is automatically handled by Terraform's `web.sh` script during provisioning.
 
-**What this installs:**
+**What gets installed automatically:**
 - Ansible
 - kops (Kubernetes Operations)
 - kubectl
 - AWS CLI
 - Required dependencies
+
+*Optional: Run `ansible-playbook server-config.yaml` if manual configuration is needed.*
 
 ### Step 3: Setup AWS Credentials on kops Server
 
