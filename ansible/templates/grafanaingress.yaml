@@ -6,10 +6,6 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    nginx.ingress.kubernetes.io/server-snippet: |
-      grpc_read_timeout 300;
-      grpc_send_timeout 300;
-      client_max_body_size 1m;
 spec:
   ingressClassName: nginx
   rules:

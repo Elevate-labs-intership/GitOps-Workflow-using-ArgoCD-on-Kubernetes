@@ -13,7 +13,7 @@
       
     - name: Copy updated ArgoCD Ingress template
       ansible.builtin.template:
-        src: templates/argoingress.yaml
+        src: ../templates/argoingress.yaml
         dest: /tmp/argoingress.yaml
         
     - name: Apply updated ingress
