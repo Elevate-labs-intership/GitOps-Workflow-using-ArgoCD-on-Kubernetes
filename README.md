@@ -100,16 +100,10 @@ all:
 
 ### Step 4: Kubernetes Cluster Setup with kops
 
-#### 4.1 Create Kubernetes Cluster
+#### 4.1 Create and Deploy Kubernetes Cluster
 ```bash
-# Create the cluster configuration
-ansible-playbook kops/cluster-setup.yaml
-```
-
-#### 4.2 Deploy the Cluster
-```bash
-# Deploy the actual cluster
-ansible-playbook kops/cluster-deploy.yaml
+# Create cluster configuration and deploy
+ansible-playbook kops/kops.yaml
 ```
 
 **What this creates:**
@@ -119,16 +113,8 @@ ansible-playbook kops/cluster-deploy.yaml
 - AWS Load Balancers
 - DNS records in Route53
 
-### Step 5: DNS Configuration and Validation
+### Step 5: Cluster Validation
 
-#### 5.1 Handle DNS Propagation
-If DNS hasn't propagated yet (common with new domains):
-```bash
-# Add temporary hosts entry to bypass DNS delay
-ssh -i StackOps-1.pem ubuntu@YOUR_EC2_IP "echo '3.237.188.5 api.kubevpro.devopshemantkumar.info' | sudo tee -a /etc/hosts"
-```
-
-#### 5.2 Validate Cluster
 ```bash
 # Validate the cluster is healthy
 ansible-playbook kops/validation.yaml
@@ -150,7 +136,7 @@ ansible-playbook kops/ingress.yaml
 **Note:** If you encounter LoadBalancer restrictions (common with new AWS accounts):
 ```bash
 # Use NodePort instead of LoadBalancer
-ansible-playbook kops/ingress-nodeport.yaml
+kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec":{"type":"NodePort"}}'
 ```
 
 ### Step 7: Monitoring Stack Deployment
@@ -158,7 +144,7 @@ ansible-playbook kops/ingress-nodeport.yaml
 #### 7.1 Deploy Prometheus and Grafana
 ```bash
 # Install monitoring stack
-ansible-playbook monitoring/monitoring.yaml
+ansible-playbook monitoring/prometeus.yaml
 ```
 
 **What this deploys:**
@@ -199,7 +185,7 @@ ansible-playbook argocd/argocd-patch.yaml
 #### 8.3 Get ArgoCD Admin Password
 ```bash
 # Retrieve ArgoCD admin password
-ansible-playbook argocd/argocd-password.yaml
+ansible-playbook argocd/get-argocd-password.yaml
 ```
 
 **Access URL:**
@@ -240,32 +226,56 @@ kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec":{"type":
 ```
 GitOps-Workflow-using-ArgoCD-on-Kubernetes/
 ├── terraform/                 # Infrastructure as Code
-│   ├── main.tf               # Main Terraform configuration
-│   ├── variables.tf          # Variable definitions
-│   ├── outputs.tf            # Output values
-│   ├── web.sh               # Server initialization script
-│   └── credentials          # AWS credentials
-├── ansible/                  # Configuration Management
-│   ├── inventory.yaml        # Ansible inventory
-│   ├── server-config.yaml    # Server configuration playbook
-│   ├── kops/                # Kubernetes cluster management
-│   │   ├── cluster-setup.yaml
-│   │   ├── cluster-deploy.yaml
-│   │   ├── validation.yaml
-│   │   ├── ingress.yaml
-│   │   └── setup-credentials.yaml
-│   ├── monitoring/          # Monitoring stack
-│   │   ├── monitoring.yaml
-│   │   └── monitoring-ingress.yaml
-│   ├── argocd/             # GitOps deployment
-│   │   ├── argocd.yaml
-│   │   ├── argocd-patch.yaml
-│   │   └── argocd-password.yaml
-│   └── templates/          # Kubernetes manifests
+│   ├── provider.tf           # AWS provider configuration
+│   ├── vpc.tf               # VPC and networking
+│   ├── instance.tf          # EC2 instance configuration
+│   ├── SecGrp.tf            # Security groups
+│   ├── Keypair.tf           # SSH key pair
+│   ├── backend.tf           # Terraform backend
+│   ├── variables.tf         # Variable definitions
+│   ├── output.tf            # Output values
+│   ├── web.sh              # Server initialization script
+│   └── credentials         # AWS credentials
+├── ansible/                 # Configuration Management
+│   ├── inventory.yaml       # Ansible inventory
+│   ├── StackOps-1.pem      # SSH private key
+│   ├── cleanup.yaml        # Cleanup playbook
+│   ├── kops/               # Kubernetes cluster management
+│   │   ├── kops.yaml       # Cluster setup and deployment
+│   │   ├── validation.yaml # Cluster validation
+│   │   ├── ingress.yaml    # Ingress controller
+│   │   └── check-ingress.yaml # Ingress status check
+│   ├── monitoring/         # Monitoring stack
+│   │   ├── prometeus.yaml  # Prometheus and Grafana
+│   │   └── monitoring-ingress.yaml # Monitoring ingress
+│   ├── argocd/            # GitOps deployment
+│   │   ├── argocd.yaml    # ArgoCD installation
+│   │   ├── argocd-patch.yaml # ArgoCD configuration
+│   │   └── get-argocd-password.yaml # Password retrieval
+│   └── templates/         # Kubernetes manifests
 │       ├── argoingress.yaml
 │       ├── grafanaingress.yaml
 │       └── prometheusingress.yaml
-└── README.md               # This file
+├── k8s/                    # Application manifests
+│   ├── appdeploy.yaml     # Application deployment
+│   ├── appservice.yaml    # Application service
+│   ├── appingress.yaml    # Application ingress
+│   ├── dbdeploy.yaml      # Database deployment
+│   ├── dbservice.yaml     # Database service
+│   ├── dbpvc.yaml         # Database persistent volume
+│   ├── mcdep.yaml         # Memcached deployment
+│   ├── mcservice.yaml     # Memcached service
+│   ├── rmqdeploy.yaml     # RabbitMQ deployment
+│   ├── rmqservice.yaml    # RabbitMQ service
+│   └── secert.yaml        # Secrets
+├── images/                # Project screenshots
+│   ├── architecture.png
+│   ├── grafana-dashboard.png
+│   ├── prometheus.png
+│   ├── argocd.png
+│   ├── application-homepage.png
+│   └── application-dashboard.png
+└── README.md              # This file
 ```
 
 ## 🎯 Learning Outcomes
